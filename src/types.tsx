@@ -1,7 +1,7 @@
 export interface Book {
   title: string;
-  metadata: string[];
-  seriesInfo: string[];
+  metadata?: string[];
+  seriesInfo?: string[];
   bookNumber: number | null;
   isAnthology: boolean;
 }

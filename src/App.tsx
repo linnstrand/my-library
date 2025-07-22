@@ -17,9 +17,6 @@ const App: React.FC = () => {
       amazonbook.authors.forEach((a) => {
         const authors = a.split(':').filter((s) => s.length > 1);
         const isAnthology = authors.length > 3;
-        if (isAnthology && authors.length < 4) {
-          console.log(authors, amazonbook);
-        }
         const book = parseBookString(amazonbook.title, isAnthology);
         const keys = isAnthology ? ['Collections'] : authors;
         keys.forEach((key) => {
@@ -38,7 +35,8 @@ const App: React.FC = () => {
         if (a[0] === 'Collections') {
           return 1;
         }
-        return a[0].localeCompare(b[0]);
+        // return a[0].localeCompare(b[0]);
+        return a[1].books.length < b[1].books.length;
       })
     );
 

@@ -1,8 +1,8 @@
 import type { Book } from './types';
 
 export function parseBookString(input: string, isAnthology: boolean): Book {
-  const seriesInfo: string[] = [];
-  const metadata: string[] = [];
+  let seriesInfo: string[] | undefined = [];
+  let metadata: string[] | undefined = [];
   let bookNumber: number | null = null;
 
   // Extract content inside parentheses
@@ -16,7 +16,7 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
     if (number !== null && bookNumber === null) {
       bookNumber = number;
     }
-    const cleaned = raw.replace(/\bBook\s*\d+\b/i, '').trim();
+    const cleaned = getCleaned(raw);
     if (cleaned) {
       seriesInfo.push(cleaned);
     }
@@ -46,6 +46,12 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
     }
   }
 
+  if (seriesInfo.length === 0) {
+    seriesInfo = undefined;
+  }
+  if (metadata.length === 0) {
+    metadata = undefined;
+  }
   return {
     title,
     metadata,
@@ -55,7 +61,49 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
   };
 }
 
-function extractBookNumber(text: string): number | null {
-  const match = text.match(/\bBook\s*(\d+)\b/i) || text.match(/\b(\d+)\b/);
-  return match ? parseInt(match[1], 10) : null;
-}
+const numberWords = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+};
+
+const getCleaned = (text: string) => {
+  const cleaned = text
+    .replace(
+      /\bbook\s*(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i,
+      ''
+    )
+    .trim();
+  return cleaned
+    .replace(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i, '')
+    .trim();
+};
+
+const extractBookNumber = (text: string): number | null => {
+  text = text.toLowerCase();
+
+  // Try to match "Book" followed by a number or number word
+  const match =
+    text.match(
+      /\bbook\s*(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i
+    ) ||
+    text.match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\b/i);
+
+  if (!match) return null;
+
+  const value = match[1];
+
+  // Convert word to number if needed
+  if (numberWords[value]) {
+    return numberWords[value];
+  }
+
+  return parseInt(value, 10);
+};

@@ -7,7 +7,6 @@ type MainViewProps = {
 };
 
 export const MainView = ({ books, view, onBookSelect }: MainViewProps) => {
-  console.log(books);
   return (
     <div
       className={view === 'grid' ? 'grid grid-cols-3 gap-4 p-4' : 'list p-4'}
@@ -19,11 +18,21 @@ export const MainView = ({ books, view, onBookSelect }: MainViewProps) => {
         >
           <h3 className="font-bold">{name}</h3>
           books: {author.books.length}
-          {author.books.map((book) => (
-            <div>
-              {book.title} {book.metadata} {book.seriesInfo}
-            </div>
-          ))}
+          {author.books.map((book) => {
+            const meta = book.seriesInfo ?? book.metadata;
+            return meta ? (
+              <div>
+                <b>{book.title}</b>
+                <span>
+                  :{book.bookNumber} {meta}
+                </span>
+              </div>
+            ) : (
+              <div>
+                <b>{book.title}</b>
+              </div>
+            );
+          })}
         </div>
       ))}
     </div>
