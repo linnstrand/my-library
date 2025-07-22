@@ -1,38 +1,31 @@
-import React from "react";
-
-type Book = {
-  id: number;
-  title: string;
-  writer: string;
-  year: number;
-  serie?: string;
-};
+import type { Author, BookAmazon } from '../types';
 
 type MainViewProps = {
-  books: Book[];
-  view: "grid" | "list";
-  onBookSelect: (book: Book) => void;
+  books: Map<string, Author>;
+  view: 'grid' | 'list';
+  onBookSelect: (book: BookAmazon) => void;
 };
 
-const MainView: React.FC<MainViewProps> = ({ books, view, onBookSelect }) => {
+export const MainView = ({ books, view, onBookSelect }: MainViewProps) => {
+  console.log(books);
   return (
     <div
-      className={view === "grid" ? "grid grid-cols-3 gap-4 p-4" : "list p-4"}
+      className={view === 'grid' ? 'grid grid-cols-3 gap-4 p-4' : 'list p-4'}
     >
-      {books.map((book) => (
+      {[...books.entries()].map(([name, author]) => (
         <div
-          key={book.id}
+          key={name}
           className="p-4 border rounded cursor-pointer hover:shadow"
-          onClick={() => onBookSelect(book)}
         >
-          <h3 className="font-bold">{book.title}</h3>
-          <p>Writer: {book.writer}</p>
-          <p>Year: {book.year}</p>
-          {book.serie && <p>Serie: {book.serie}</p>}
+          <h3 className="font-bold">{name}</h3>
+          books: {author.books.length}
+          {author.books.map((book) => (
+            <div>
+              {book.title} {book.metadata} {book.seriesInfo}
+            </div>
+          ))}
         </div>
       ))}
     </div>
   );
 };
-
-export default MainView;

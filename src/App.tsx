@@ -1,73 +1,56 @@
-import React, { useState } from "react";
-import Header from "./components/Header";
-import MainView from "./components/MainView";
-import Sidebar from "./components/Sidebar";
+import React, { useState } from 'react';
+import { Header } from './components/Header';
+import { MainView } from './components/MainView';
+import { Sidebar } from './components/Sidebar';
+import amazon from './amazon.json';
+import type { BookAmazon, Author } from './types';
+import { parseBookString } from './utils';
 
-interface Book {
-  id: number;
-  title: string;
-  writer: string;
-  year: number;
-  serie?: string;
-}
+const amazonbooks = amazon as BookAmazon[];
 
 const App: React.FC = () => {
-  const [view, setView] = useState<"grid" | "list">("grid");
-  const [groupBy, setGroupBy] = useState<"serie" | "writer">("serie");
-  const [sortBy, setSortBy] = useState<"title" | "writer" | "year">("title");
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [selectedBook, setSelectedBook] = useState<BookAmazon | null>(null);
 
-  const books: Book[] = [
-    {
-      id: 1,
-      title: "Book One",
-      writer: "Author A",
-      year: 2020,
-      serie: "Series X",
-    },
-    { id: 2, title: "Book Two", writer: "Author B", year: 2018 },
-    {
-      id: 3,
-      title: "Book Three",
-      writer: "Author A",
-      year: 2021,
-      serie: "Series X",
-    },
-  ];
+  const groupBooksBy = () => {
+    const authors = amazonbooks.reduce((acc, amazonbook) => {
+      amazonbook.authors.forEach((a) => {
+        const authors = a.split(':').filter((s) => s.length > 1);
+        const isAnthology = authors.length > 3;
+        if (isAnthology && authors.length < 4) {
+          console.log(authors, amazonbook);
+        }
+        const book = parseBookString(amazonbook.title, isAnthology);
+        const keys = isAnthology ? ['Collections'] : authors;
+        keys.forEach((key) => {
+          if (!acc.has(key)) {
+            const author = { books: [] };
+            acc.set(key, author);
+          }
+          acc.get(key)!.books.push(book);
+        });
+      });
+      return acc;
+    }, new Map<string, Author>());
 
-  const groupedBooks =
-    groupBy === "serie"
-      ? books.reduce((acc, book) => {
-          const key = book.serie || "No Serie";
-          acc[key] = acc[key] || [];
-          acc[key].push(book);
-          return acc;
-        }, {} as Record<string, Book[]>)
-      : books.reduce((acc, book) => {
-          const key = book.writer;
-          acc[key] = acc[key] || [];
-          acc[key].push(book);
-          return acc;
-        }, {} as Record<string, Book[]>);
+    const sortedMap = new Map(
+      [...authors.entries()].sort((a, b) => {
+        if (a[0] === 'Collections') {
+          return 1;
+        }
+        return a[0].localeCompare(b[0]);
+      })
+    );
 
-  const sortedBooks = Object.values(groupedBooks).flatMap((group) =>
-    group.sort((a, b) => {
-      if (sortBy === "title") return a.title.localeCompare(b.title);
-      if (sortBy === "writer") return a.writer.localeCompare(b.writer);
-      return a.year - b.year;
-    })
-  );
+    return sortedMap;
+  };
 
   return (
     <div className="flex">
       <div className="flex-1">
-        <Header
-          onViewChange={setView}
-          onGroupByChange={setGroupBy}
-          onSortChange={setSortBy}
-        />
+        <Header onViewChange={setView} />
         <MainView
-          books={sortedBooks}
+          books={groupBooksBy()}
           view={view}
           onBookSelect={setSelectedBook}
         />
