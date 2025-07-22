@@ -1,8 +1,8 @@
 import type { Book } from './types';
 
 export function parseBookString(input: string, isAnthology: boolean): Book {
-  let seriesInfo: string[] | undefined = [];
-  let metadata: string[] | undefined = [];
+  const seriesInfos: string[] = [];
+  const metadatas: string[] = [];
   let bookNumber: number | null = null;
 
   // Extract content inside parentheses
@@ -18,7 +18,7 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
     }
     const cleaned = getCleaned(raw);
     if (cleaned) {
-      seriesInfo.push(cleaned);
+      seriesInfos.push(cleaned);
     }
   }
 
@@ -41,18 +41,26 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
       }
       const cleaned = part.replace(/\bBook\s*\d+\b/i, '').trim();
       if (cleaned) {
-        metadata.push(cleaned);
+        metadatas.push(cleaned);
       }
     }
   }
+  let seriesInfo;
+  let metadata;
+  if (seriesInfos.length > 0) {
+    seriesInfo = seriesInfos[seriesInfos.length - 1];
+  }
 
-  if (seriesInfo.length === 0) {
-    seriesInfo = undefined;
+  if (metadatas.length > 0) {
+    if (!seriesInfo) {
+      seriesInfo = metadatas[0];
+    } else {
+      metadata = metadatas.join(', ');
+    }
   }
-  if (metadata.length === 0) {
-    metadata = undefined;
-  }
+
   return {
+    rawtitle: input,
     title,
     metadata,
     seriesInfo,

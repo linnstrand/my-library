@@ -1,7 +1,8 @@
 export interface Book {
   title: string;
-  metadata?: string[];
-  seriesInfo?: string[];
+  rawtitle: string;
+  metadata?: string;
+  seriesInfo?: string;
   bookNumber: number | null;
   isAnthology: boolean;
 }
@@ -15,5 +16,6 @@ export interface BookAmazon {
 }
 
 export interface Author {
+  series?: Partial<Record<string, Book[]>>;
   books: Book[];
 }

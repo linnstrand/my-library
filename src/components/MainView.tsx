@@ -1,38 +1,60 @@
 import type { Author, BookAmazon } from '../types';
 
 type MainViewProps = {
-  books: Map<string, Author>;
+  authors: Map<string, Author>;
   view: 'grid' | 'list';
   onBookSelect: (book: BookAmazon) => void;
 };
 
-export const MainView = ({ books, view, onBookSelect }: MainViewProps) => {
+export const MainView = ({ authors, view, onBookSelect }: MainViewProps) => {
   return (
     <div
       className={view === 'grid' ? 'grid grid-cols-3 gap-4 p-4' : 'list p-4'}
     >
-      {[...books.entries()].map(([name, author]) => (
-        <div
-          key={name}
-          className="p-4 border rounded cursor-pointer hover:shadow"
-        >
-          <h3 className="font-bold">{name}</h3>
+      {[...authors.entries()].map(([name, author]) => (
+        <div key={name} className="p-4 border rounded">
+          <h3 className="font-bold"> {name.split(', ').reverse().join(' ')}</h3>
           books: {author.books.length}
-          {author.books.map((book) => {
+          {/* {author.books.map((book) => {
             const meta = book.seriesInfo ?? book.metadata;
             return meta ? (
               <div>
                 <b>{book.title}</b>
-                <span>
-                  :{book.bookNumber} {meta}
-                </span>
+                <span>{book.seriesInfo}</span>
               </div>
             ) : (
               <div>
                 <b>{book.title}</b>
               </div>
             );
-          })}
+          })} */}
+          {author.series &&
+            Object.entries(author.series).map(([name, books]) => {
+              if (name === 'Standalone') {
+                return (
+                  <div>
+                    {books?.map((book) => (
+                      <div>
+                        <b>{book.title}</b>
+                        <span>{book.seriesInfo ?? book.metadata}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+              return (
+                <div>
+                  <b>{name}</b>
+                  <div>
+                    {books?.map((b) => (
+                      <div>
+                        {b.bookNumber} {b.title}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
         </div>
       ))}
     </div>

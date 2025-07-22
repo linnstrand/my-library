@@ -30,13 +30,39 @@ const App: React.FC = () => {
       return acc;
     }, new Map<string, Author>());
 
+    authors.forEach((a) => {
+      a.books.sort((a, b) => {
+        if (a.bookNumber && b.bookNumber) {
+          return a.bookNumber > b.bookNumber ? 1 : -1;
+        }
+
+        return a.title.localeCompare(b.title);
+      });
+      const result = Object.groupBy(
+        a.books,
+        ({ seriesInfo }) => seriesInfo ?? 'Standalone'
+      );
+      a.series = result;
+    });
+
+    //     authors.forEach((a) => {
+    //   const groups = a.books.reduce((acc, obj) => {
+    //     const key = obj.seriesInfo;
+    //     if (!key) return acc;
+    //     const curGroup = acc[key] ?? [];
+    //     return { ...acc, [key]: [...curGroup, obj] };
+    //   }, {});
+
+    //   a.series = groups;
+    // });
+
     const sortedMap = new Map(
       [...authors.entries()].sort((a, b) => {
         if (a[0] === 'Collections') {
           return 1;
         }
         // return a[0].localeCompare(b[0]);
-        return a[1].books.length < b[1].books.length;
+        return a[1].books.length < b[1].books.length ? 1 : -1;
       })
     );
 
@@ -48,7 +74,7 @@ const App: React.FC = () => {
       <div className="flex-1">
         <Header onViewChange={setView} />
         <MainView
-          books={groupBooksBy()}
+          authors={groupBooksBy()}
           view={view}
           onBookSelect={setSelectedBook}
         />
