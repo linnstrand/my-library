@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Header from "./components/Header";
 import MainView from "./components/MainView";
 import Sidebar from "./components/Sidebar";
-import "./App.css";
 
 interface Book {
   id: number;
