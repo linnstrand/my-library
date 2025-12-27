@@ -1,6 +1,9 @@
-import type { Book } from './types';
+import type { TitleData } from './types';
 
-export function parseBookString(input: string, isAnthology: boolean): Book {
+export function parseAmazonTitleString(
+  input: string,
+  isAnthology: boolean
+): TitleData {
   const seriesInfos: string[] = [];
   const metadatas: string[] = [];
   let bookNumber: number | null = null;
@@ -45,6 +48,60 @@ export function parseBookString(input: string, isAnthology: boolean): Book {
       }
     }
   }
+  let seriesInfo;
+  let metadata;
+  if (seriesInfos.length > 0) {
+    seriesInfo = seriesInfos[seriesInfos.length - 1];
+  }
+
+  if (metadatas.length > 0) {
+    if (!seriesInfo) {
+      seriesInfo = metadatas[0];
+    } else {
+      metadata = metadatas.join(', ');
+    }
+  }
+
+  return {
+    rawtitle: input,
+    title,
+    metadata,
+    seriesInfo,
+    bookNumber,
+    isAnthology,
+  };
+}
+
+export function parseGoodreadTitleString(
+  input: string,
+  isAnthology: boolean
+): TitleData {
+  const seriesInfos: string[] = [];
+  const metadatas: string[] = [];
+  let bookNumber: number | null = null;
+
+  // Extract content inside parentheses
+  const parenRegex = /\(([^)]+)\)/g;
+  const parenMatches = input.match(parenRegex) || [];
+
+  // Extract and clean seriesInfo, look for bookNumber
+  for (const match of parenMatches) {
+    const raw = match.slice(1, -1).split(','); // Remove parentheses
+    const matchNr = input.match(/#(\d+)/);
+    bookNumber = matchNr ? Number(matchNr[1]) : null;
+
+    if (raw[0].includes('#')) {
+      const info = raw[0].split('#')[0].trim();
+      seriesInfos.push(info);
+    } else {
+      const info = raw[0].trim();
+      seriesInfos.push(info);
+    }
+  }
+
+  // Remove all parentheses content from the original string
+  const title = input.replace(parenRegex, '').trim();
+
   let seriesInfo;
   let metadata;
   if (seriesInfos.length > 0) {

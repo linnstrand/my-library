@@ -6,47 +6,48 @@ type MainViewProps = {
   onBookSelect: (book: BookAmazon) => void;
 };
 
-export const MainView = ({ authors, view, onBookSelect }: MainViewProps) => {
-  return (
-    <div
-      className={view === 'grid' ? 'grid grid-cols-3 gap-4 p-4' : 'list p-4'}
-    >
+export const MainView = ({ authors, view }: MainViewProps) => {
+  return view === 'list' ? (
+    <div className={'grid grid-cols-3 gap-4 p-4'}>
       {[...authors.entries()].map(([name, author]) => (
-        <div key={name} className="p-4 border rounded">
-          <h3 className="font-bold"> {name.split(', ').reverse().join(' ')}</h3>
-          books: {author.books.length}
-          {/* {author.books.map((book) => {
-            const meta = book.seriesInfo ?? book.metadata;
-            return meta ? (
-              <div>
-                <b>{book.title}</b>
-                <span>{book.seriesInfo}</span>
-              </div>
-            ) : (
-              <div>
-                <b>{book.title}</b>
-              </div>
-            );
-          })} */}
+        <div key={name} className="p-2 border rounded">
+          <div className="flex justify-between">
+            <h3 className="m-0 text-l">
+              {name.split(', ').reverse().join(' ')}
+            </h3>
+            <div className="text-g">{author.books.length}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className={'grid grid-cols-3 gap-4 p-4'}>
+      {[...authors.entries()].map(([name, author]) => (
+        <div key={name} className="p-2 border rounded">
+          <h3 className="m-0 text-xl">
+            {name.split(', ').reverse().join(' ')}
+          </h3>
           {author.series &&
-            Object.entries(author.series).map(([name, books]) => {
-              if (name === 'Standalone') {
+            Object.entries(author.series).map(([name, serie]) => {
+              if (name === 'Standalone' || serie?.length === 1) {
                 return (
-                  <div>
-                    {books?.map((book) => (
-                      <div>
-                        <b>{book.title}</b>
-                        <span>{book.seriesInfo ?? book.metadata}</span>
-                      </div>
+                  <ol className="mx-1">
+                    {serie?.map((book) => (
+                      <li>
+                        <span>{book.title}</span>
+                        <span className="text-xs overflow-ellipsis">
+                          {book.readDate} {book.metadata}
+                        </span>
+                      </li>
                     ))}
-                  </div>
+                  </ol>
                 );
               }
               return (
                 <div>
                   <b>{name}</b>
                   <div>
-                    {books?.map((b) => (
+                    {serie?.map((b) => (
                       <div>
                         {b.bookNumber} {b.title}
                       </div>

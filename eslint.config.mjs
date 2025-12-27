@@ -16,8 +16,14 @@ export default tseslint.config([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 'latest',
       globals: globals.browser,
+    },
+  },
+  {
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-undef': 'warn',
     },
   },
 ]);
