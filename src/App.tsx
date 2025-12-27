@@ -20,7 +20,7 @@ const getGoodreadBooks = (goodreadsbooks: Goodreads[]) => {
     const titleData = parseGoodreadTitleString(goodreadBook.Title, isAnthology);
     const book = {
       ...titleData,
-      additionalAuthors: goodreadBook['Additional Authors'],
+      additionalAuthors: goodreadBook['Additional Authors'].split(', '),
       isbn: goodreadBook.ISBN,
       rating: goodreadBook['Average Rating'],
       publisher: goodreadBook.Publisher,
@@ -76,6 +76,7 @@ const getAmazonBooks = () => {
       const authors = a.split(':').filter((s) => s.length > 1);
       const isAnthology = authors.length > 3;
       const book = parseAmazonTitleString(amazonbook.title, isAnthology);
+      book.ownedOnAmazon = true;
       const keys = isAnthology ? ['Collections'] : authors;
       keys.forEach((key) => {
         if (!acc.has(key)) {
@@ -103,17 +104,6 @@ const getAmazonBooks = () => {
     a.series = result;
   });
 
-  //     authors.forEach((a) => {
-  //   const groups = a.books.reduce((acc, obj) => {
-  //     const key = obj.seriesInfo;
-  //     if (!key) return acc;
-  //     const curGroup = acc[key] ?? [];
-  //     return { ...acc, [key]: [...curGroup, obj] };
-  //   }, {});
-
-  //   a.series = groups;
-  // });
-
   const sortedMap = new Map(
     [...authors.entries()].sort((a, b) => {
       if (a[0] === 'Collections') {
@@ -135,9 +125,11 @@ const App: React.FC = () => {
     const goodreadsbooks = goodread as Goodreads[];
     const readGoodreads = goodreadsbooks.filter((g) => g['Read Count'] > 0);
     const books = getGoodreadBooks(readGoodreads);
+    const merged = [...books].map((a) => {
+      const author = a[0];
+    });
     const abooks = getAmazonBooks();
-    console.log(books, abooks);
-    return books;
+    return abooks;
   };
 
   return (

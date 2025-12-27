@@ -34,7 +34,11 @@ export const MainView = ({ authors, view }: MainViewProps) => {
                   <ol className="mx-1">
                     {serie?.map((book) => (
                       <li>
-                        <span>{book.title}</span>
+                        <span
+                          className={book.ownedOnAmazon ? 'text-amber-600' : ''}
+                        >
+                          {book.title}
+                        </span>
                         <span className="text-xs overflow-ellipsis">
                           {book.readDate} {book.metadata}
                         </span>
@@ -48,7 +52,10 @@ export const MainView = ({ authors, view }: MainViewProps) => {
                   <b>{name}</b>
                   <div>
                     {serie?.map((b) => (
-                      <div>
+                      <div
+                        className={b.ownedOnAmazon ? 'text-amber-600' : ''}
+                        key={b.title}
+                      >
                         {b.bookNumber} {b.title}
                       </div>
                     ))}

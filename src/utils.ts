@@ -1,9 +1,9 @@
-import type { TitleData } from './types';
+import type { Book, TitleData } from './types';
 
 export function parseAmazonTitleString(
   input: string,
   isAnthology: boolean
-): TitleData {
+): Book {
   const seriesInfos: string[] = [];
   const metadatas: string[] = [];
   let bookNumber: number | null = null;
@@ -78,25 +78,18 @@ export function parseGoodreadTitleString(
 ): TitleData {
   const seriesInfos: string[] = [];
   const metadatas: string[] = [];
-  let bookNumber: number | null = null;
 
   // Extract content inside parentheses
   const parenRegex = /\(([^)]+)\)/g;
   const parenMatches = input.match(parenRegex) || [];
+  const matchNr = input.match(/#(\d+(?:\.\d+)?)/);
+  const bookNumber = matchNr ? Number(matchNr[1]) : null;
 
   // Extract and clean seriesInfo, look for bookNumber
   for (const match of parenMatches) {
-    const raw = match.slice(1, -1).split(','); // Remove parentheses
-    const matchNr = input.match(/#(\d+)/);
-    bookNumber = matchNr ? Number(matchNr[1]) : null;
-
-    if (raw[0].includes('#')) {
-      const info = raw[0].split('#')[0].trim();
-      seriesInfos.push(info);
-    } else {
-      const info = raw[0].trim();
-      seriesInfos.push(info);
-    }
+    const raw = match.slice(1, -1);
+    const result = raw.match(/^[^,#]*/)?.[0] ?? input;
+    seriesInfos.push(result);
   }
 
   // Remove all parentheses content from the original string
