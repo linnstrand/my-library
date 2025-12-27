@@ -8,6 +8,7 @@ export interface TitleData {
 }
 
 export interface Book extends TitleData {
+  author: string;
   aditionalAuthors?: string[];
   isbn?: string;
   rating?: number;

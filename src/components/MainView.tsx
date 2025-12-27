@@ -29,24 +29,24 @@ export const MainView = ({ authors, view }: MainViewProps) => {
           </h3>
           {author.series &&
             Object.entries(author.series).map(([name, serie]) => {
-              if (name === 'Standalone' || serie?.length === 1) {
-                return (
-                  <ol className="mx-1">
-                    {serie?.map((book) => (
-                      <li>
-                        <span
-                          className={book.ownedOnAmazon ? 'text-amber-600' : ''}
-                        >
-                          {book.title}
-                        </span>
-                        <span className="text-xs overflow-ellipsis">
-                          {book.readDate} {book.metadata}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                );
-              }
+              // if (name === 'Standalone' || serie?.length === 1) {
+              //   return (
+              //     <ol className="mx-1">
+              //       {serie?.map((book) => (
+              //         <li>
+              //           <span
+              //             className={book.ownedOnAmazon ? 'text-amber-600' : ''}
+              //           >
+              //             {book.title}
+              //           </span>
+              //           <span className="text-xs overflow-ellipsis">
+              //             {book.readDate} {book.metadata}
+              //           </span>
+              //         </li>
+              //       ))}
+              //     </ol>
+              //   );
+              // }
               return (
                 <div>
                   <b>{name}</b>
