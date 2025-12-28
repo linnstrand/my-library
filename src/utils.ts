@@ -1,16 +1,13 @@
-import type { Book, TitleData } from './types';
+import type { Book, BookAmazon, TitleData } from './types';
 
-export function parseAmazonTitleString(
-  input: string,
-  isAnthology: boolean
-): Book {
+export function parseAmazonTitleString(input: BookAmazon): Book {
   const seriesInfos: string[] = [];
   const metadatas: string[] = [];
   let bookNumber: number | null = null;
 
   // Extract content inside parentheses
   const parenRegex = /\(([^)]+)\)/g;
-  const parenMatches = input.match(parenRegex) || [];
+  const parenMatches = input.title.match(parenRegex) || [];
 
   // Extract and clean seriesInfo, look for bookNumber
   for (const match of parenMatches) {
@@ -26,7 +23,7 @@ export function parseAmazonTitleString(
   }
 
   // Remove all parentheses content from the original string
-  const cleanedInput = input.replace(parenRegex, '').trim();
+  const cleanedInput = input.title.replace(parenRegex, '').trim();
 
   // Split title and rest at the first colon
   const [rawTitle, rest] = cleanedInput.split(/:(.+)/).map((s) => s.trim());
@@ -62,20 +59,22 @@ export function parseAmazonTitleString(
     }
   }
 
+  let authors = input.authors[0].split(':').filter((s) => s.length > 1);
+  const author = authors.length > 1 ? 'Multiple' : (authors.pop() ?? '');
+  authors = authors.filter((a) => !!a);
+
   return {
-    rawtitle: input,
+    authorLF: author,
+    author: author.split(', ').reverse().join(' '),
+    aditionalAuthors: authors.length > 0 ? authors : undefined,
+    ownedOnAmazon: true,
     title,
-    metadata,
     seriesInfo,
     bookNumber,
-    isAnthology,
   };
 }
 
-export function parseGoodreadTitleString(
-  input: string,
-  isAnthology: boolean
-): TitleData {
+export function parseGoodreadTitleString(input: string): TitleData {
   const seriesInfos: string[] = [];
   const metadatas: string[] = [];
 
@@ -110,12 +109,9 @@ export function parseGoodreadTitleString(
   }
 
   return {
-    rawtitle: input,
     title,
-    metadata,
     seriesInfo,
     bookNumber,
-    isAnthology,
   };
 }
 
@@ -165,3 +161,8 @@ const extractBookNumber = (text: string): number | null => {
 
   return parseInt(value, 10);
 };
+
+export function extractNumber(str: string) {
+  const num = Number(str.replace(/\D+/g, ''));
+  return num > 0 ? num : undefined;
+}

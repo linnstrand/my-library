@@ -1,16 +1,14 @@
 export interface TitleData {
   title: string;
-  rawtitle: string;
-  metadata?: string;
   seriesInfo?: string;
   bookNumber: number | null;
-  isAnthology: boolean;
 }
 
 export interface Book extends TitleData {
+  authorLF: string;
   author: string;
   aditionalAuthors?: string[];
-  isbn?: string;
+  isbn?: number;
   rating?: number;
   publisher?: string;
   pageCount?: number;
@@ -30,6 +28,8 @@ export interface BookAmazon {
 export interface Author {
   series?: Partial<Record<string, Book[]>>;
   books: Book[];
+  authorLF: string;
+  author: string;
 }
 
 export interface Goodreads {
